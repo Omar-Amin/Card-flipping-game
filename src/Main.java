@@ -4,6 +4,7 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) {
+        System.out.println("Type 'exit' if you want to leave this game");
 
         Scanner sc = new Scanner(System.in);
 
@@ -14,17 +15,28 @@ public class Main {
                 numCards = sc.nextInt();
                 break;
             }catch (InputMismatchException e){
+                if(sc.next().equals("exit")){
+                    System.exit(1);
+                }
                 System.out.println("WRONG INPUT!!!");
-                sc.next();
             }
         }
 
         CardFlip c = new CardFlip(numCards);
 
-        System.out.println("Type 'exit' if you want to leave this game");
+        System.out.println("The numbers on first row shows if the card is flipped or not.");
+        System.out.println("Numbers on second row is the number of the card");
         while (sc.hasNext()){
             try {
-                c.runGame(sc.nextInt());
+                String gameStatus = c.runGame(sc.nextInt());
+                if (gameStatus.equals("lost")) {
+                    System.out.println("You lost!");
+                    break;
+                }
+                if (gameStatus.equals("won")){
+                    System.out.println("Congratulations you won!");
+                    break;
+                }
             }catch (InputMismatchException e){
                 if(sc.next().equals("exit")){
                     break;

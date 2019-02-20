@@ -1,61 +1,57 @@
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-import java.util.stream.IntStream;
 
-public class CardFlip {
+class CardFlip {
 
-    private int numCards;
+    private ArrayList<String> listOfCards;
+    private MakeCard makecard;
 
-    public CardFlip(int numCards){
-        this.numCards = numCards;
-        makeCard();
-    }
-
-    public void runGame(int respond){
-
-        System.out.println(respond);
+    CardFlip(int numCards){
+        this.makecard = new MakeCard(numCards);
+        this.listOfCards = makecard.randomize();
+        makecard.makeGrid(listOfCards);
 
     }
 
-    private List<String> makeCard(){
-        ArrayList<String> listOfCards = new ArrayList<>();
-        Random randomBit = new Random();
+    String runGame(int respond){
 
-        IntStream.range(0,numCards).forEach(n -> listOfCards.add( randomBit.nextInt(2) + "" )); //makes random cards
+        if (listOfCards.get(respond).equals("1")){
+            String left = listOfCards.get(respond-1);
+            String right = listOfCards.get(respond+1);
 
-        int count = 0;
-        for (String elm: listOfCards) {
+            if (!left.equals("") && !left.equals("R")){ //In order to prevent crashes
+                left = "" + (Integer.parseInt(left) ^ 1);
+                listOfCards.set(respond-1, left);
+            }
+            if (!right.equals("") && !right.equals("R")){
+                right = "" + (Integer.parseInt(right) ^ 1); // xor int, easy way to flip
+                listOfCards.set(respond+1,"" + right);
+            }
+            listOfCards.set(respond,"R");
+            makecard.makeGrid(listOfCards);
+            return checkGame();
+        }else {
+            System.out.println("You can only pick cards that are 1");
+            return "";
+        }
+
+    }
+
+    private String checkGame(){
+
+        for (String elm:listOfCards) {
             if (elm.equals("1")){
-                count++;
+                return "still";
             }
         }
 
-        if(count%2 == 0){   //number of 1's can't be equal
-            if (count < numCards/2) {
-                for (int i = 0; i < numCards; i++) {
-                    if (listOfCards.get(i).equals("1")) {
-                        listOfCards.set(i, "0");
-                        break;
-                    }
-                }
-                Collections.shuffle(listOfCards);
-            }else {
-                for (int i = 0; i < numCards; i++) {
-                    if (listOfCards.get(i).equals("0")) {
-                        listOfCards.set(i, "1");
-                        break;
-                    }
-                }
-                Collections.shuffle(listOfCards);
+        for (String elm: listOfCards){
+            if (elm.equals("0")){
+                return "lost";
             }
         }
 
-        listOfCards.add(0,"");
-        listOfCards.add("");
-
-        return listOfCards;
+        return "won";
     }
+
 
 }
